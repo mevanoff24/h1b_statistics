@@ -21,13 +21,13 @@ sh run.sh
 ```
 - Or you can simply run the python file directly from this top-level directory 
 ```
-./src/main.py input_filepath occupation_output_filepath state_output_filename
+python ./src/main.py input_filepath occupation_output_filepath state_output_filename
 ```
 Where the first argument is the path your input CSV file, and the second and third are the paths where you want to save the output text files. 
 
 An example of this might include 
 ```
-./src/main.py ./input/H1B_FY_2016.csv ./output/top_10_occupations.txt ./output/top_10_states.txt
+python ./src/main.py ./input/H1B_FY_2016.csv ./output/top_10_occupations.txt ./output/top_10_states.txt
 ```
 You can also pass in optional parameters such as the column names and top N results. See `-h` or `--help` for the list information about the FILEs and optional parameters. 
 
