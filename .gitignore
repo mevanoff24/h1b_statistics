@@ -1,4 +1,6 @@
 input/*.csv
+insight_testsuite/*.csv
+insight_testsuite/*.txt
 output/*.txt
 *.ipynb
 *.ipynb_checkpoints
