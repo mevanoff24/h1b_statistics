@@ -8,7 +8,7 @@ This code creates a mechanism to analyze past years data, specificially calculat
 
 ## Approach
 
-To only have to run through the data once, we compute the indicies of the columns of `status_index`, `occ_index` and `state_index`. Only if `status == CERTIFIED` we increment two dictionaries based on the count of occupations and states. We sort the dictionaries based on the number of occurrances of occupations and states and then alphabetically based on the name. After segmenting to the `topN` (10) occupations and states, we compute the percentage of applications that have been certified compared to total number of certified applications and save the results to the text files passed in by the user. Each line holds one record and each field on each line is separated by a semicolon (;).
+To only have to run through the data once, we first compute the indicies of the columns of `status_index`, `occ_index` and `state_index`. Only if `status == CERTIFIED`, we increment two dictionaries based on the count of occupations and states. We sort the dictionaries based on the number of occurrances of occupations and states and then alphabetically based on the name. After segmenting to the `topN` (10) occupations and states, we compute the percentage of applications that have been certified compared to total number of certified applications and save the results to the text file names passed in by the user. Each line holds one record and each field on each line is separated by a semicolon (;).
 
 
 
