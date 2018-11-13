@@ -27,7 +27,7 @@ class TopCounts(object):
         self.quotechar = quotechar
              
     def compute_counts(self, certified_value='CERTIFIED', status='STATUS', 
-                             soc_col='SOC_NAME', state_col='EMPLOYER_STATE'):
+                             soc_col='SOC_NAME', state_col='WORKSITE_STATE'):
         """
         Computes counts for desired column field based on column names 
         Args:
@@ -48,25 +48,34 @@ class TopCounts(object):
                              quoting=csv.QUOTE_ALL)
             # get column names
             columns = next(lines)
+            # need atleast three columns
+            assert len(columns) >= 3
             # get indicies 
             status_index, occ_index, state_index = self._get_indices(columns, status=status, 
                                                                     soc_col=soc_col, state_col=state_col)
+            # print(columns[31])
+            print(status_index, occ_index, state_index)
             # get total number of certified applications regardless of occupation
             N = 0
             for line in lines:
+                # print(line)
                 # only if status == CERTIFIED
                 if line[status_index].lower() == certified_value.lower():
                     occ = line[occ_index]
                     state = line[state_index]
                     N += 1
-                    # increment count based on occupation
-                    if occ not in occupation_counts:
-                        occupation_counts[occ] = 0
-                    occupation_counts[occ] += 1
-                    # increment count based on state
-                    if state not in state_counts:
-                        state_counts[state] = 0
-                    state_counts[state] += 1
+                    # remove missing values 
+                    if occ:
+                        # increment count based on occupation
+                        if occ not in occupation_counts:
+                            occupation_counts[occ] = 0
+                        occupation_counts[occ] += 1
+                    # remove missing values 
+                    if state:
+                        # increment count based on state
+                        if state not in state_counts:
+                            state_counts[state] = 0
+                        state_counts[state] += 1
                     
         # return count dicts and total number of certified applications regardless of occupation
         return occupation_counts, state_counts, N
@@ -78,31 +87,81 @@ class TopCounts(object):
         return [col.lower() for col in col_name.split('_')]
 
 
+    # def _get_indices(self, header_columns, status, soc_col, state_col):
+    #     """
+    #     return indices value of status, occupation and state columns
+    #     """
+    #     try:
+    #         # get split soc_col and state_col 
+    #         soc_col_names = self._split_col_name(soc_col)
+    #         # print('HERE', soc_col_names[-2], soc_col_names[-1])
+    #         state_col_names = self._split_col_name(state_col)
+    #         # loop through all column names 
+    #         for i, split_col in enumerate([col.split('_') for col in header_columns]):
+    #             # print(split_col)
+    #             for split in split_col:
+    #                 # lower 
+    #                 split = split.lower()
+    #                 if status.lower() in split:
+    #                     status_index = i
+    #                 # handles both `SOC_NAME` and `LCA_CASE_SOC_NAME` and custom 
+    #                 if soc_col_names[-2] and soc_col_names[-1] in split:
+    #                     occ_index = i
+    #                 # # handles both `EMPLOYER_STATE` and `LCA_CASE_EMPLOYER_STATE`
+    #                 if state_col_names[-2] and state_col_names[-1] in split:
+    #                     print(split_col, state_col)
+    #                     state_index = i
+    #         return status_index, occ_index, state_index
+    #     # handle exception
+    #     except UnboundLocalError:
+    #         raise Exception('COLUMN NAMES NOT FOUND. PLEASE CHECK COLUMN NAMES')
+    #     except IndexError:
+    #         raise Exception('COLUMN NAMES NOT FOUND. PLEASE CHECK COLUMN NAMES')
+
+    # def check_if_included(self, split_col, desired_col):
+        # """Check if all values are included in split column"""
+        # return all(col.lower() in split_col for col in desired_col.split('_'))
+
     def _get_indices(self, header_columns, status, soc_col, state_col):
         """
         return indices value of status, occupation and state columns
         """
+        col_dict = {
+                'status': ['CASE_STATUS', 'STATUS'], 
+                'occ': ['SOC_NAME', 'LCA_CASE_SOC_NAME'],
+                'state': ['WORKSITE_STATE', 'LCA_CASE_WORKLOC1_STATE']}
         try:
-            # get split soc_col and state_col 
-            soc_col_names = self._split_col_name(soc_col)
-            state_col_names = self._split_col_name(state_col)
             # loop through all column names 
-            for i, split_col in enumerate([col.split('_') for col in header_columns]):
-                for split in split_col:
-                    # lower 
-                    split = split.lower()
-                    if status.lower() in split:
-                        status_index = i
-                    # handles both `SOC_NAME` and `LCA_CASE_SOC_NAME` and custom 
-                    if soc_col_names[-2] and soc_col_names[-1] in split:
+            for i, split_col in enumerate(header_columns):
+                split_col = split_col.lower()
+            #     for col in col_dict['status']:
+            #         if col.lower() in split_col:
+            #             status_index = i
+            #     for col in col_dict['occ']:
+            #         if col.lower() in split_col:
+            #             occ_index = i
+            #     for col in col_dict['state']:
+            #         if col.lower() in split_col:
+            #             state_index = i
+
+
+
+
+                if status.lower() in split_col:
+                    status_index = i
+                if 'soc' in split_col:
+                    if 'name' in split_col:
                         occ_index = i
-                    # # handles both `EMPLOYER_STATE` and `LCA_CASE_EMPLOYER_STATE`
-                    if state_col_names[-2] and state_col_names[-1] in split:
+                if 'worksite' in split_col:
+                    if 'state' in split_col:
+                        state_index = i
+                elif 'workloc1' in split_col:
+                    if 'state' in split_col:
                         state_index = i
             return status_index, occ_index, state_index
         # handle exception
         except UnboundLocalError:
-            raise Exception('COLUMN NAMES NOT FOUND. PLEASE CHECK COLUMN NAMES')
+            raise Exception('COLUMN NAME NOT FOUND. PLEASE PASS IN ')
         except IndexError:
             raise Exception('COLUMN NAMES NOT FOUND. PLEASE CHECK COLUMN NAMES')
 

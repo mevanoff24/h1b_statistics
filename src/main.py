@@ -14,11 +14,10 @@ def main():
                         type=str, metavar='FILE 3')
     parser.add_argument('-topN', '--topN', help='number of top occurances -- default(10)', type=int, default=10)
     parser.add_argument('-c', '--status_level', help='STATUS LEVEL -- default(CERTIFIED)', type=str, default='CERTIFIED')
-    parser.add_argument('-a', '--status_col', help='STATUS COLUMN NAME -- default(STATUS)', type=str, default='STATUS')
-    parser.add_argument('-o', '--occupation_col', help='OCCUPATION COLUMN NAME -- default(SOC_NAME)', type=str, default='SOC_NAME')
-    parser.add_argument('-s', '--state_col', help='STATE COLUMN NAME -- default(EMPLOYER_STATE)', type=str, default='EMPLOYER_STATE')
+    parser.add_argument('-a', '--status_column', help='STATUS COLUMN NAME -- default(STATUS)', type=str, default='STATUS')
+    parser.add_argument('-o', '--occupation_column', help='OCCUPATION COLUMN NAME -- default(SOC_NAME)', type=str, default='SOC_NAME')
+    parser.add_argument('-s', '--state_column', help='STATE COLUMN NAME -- default(WORKSITE_STATE)', type=str, default='WORKSITE_STATE')
     args = parser.parse_args()
-    print(args)
     # initialize model 
     top_model = TopCounts(input_filename=args.input_filename, 
                                occupation_output_filename=args.occupation_output_filename,
@@ -26,7 +25,8 @@ def main():
                                delimiter=';')
     # compute counts 
     occ_counts, state_counts, N = top_model.compute_counts(certified_value=args.status_level, 
-                                status=args.status_col, soc_col=args.occupation_col, state_col=args.state_col)
+                                status=args.status_column, soc_col=args.occupation_column, 
+                                state_col=args.state_column)
     # sort occupation and state and by top N
     top_occs = sort_values(occ_counts, top_N=args.topN)
     top_states = sort_values(state_counts, top_N=args.topN)
