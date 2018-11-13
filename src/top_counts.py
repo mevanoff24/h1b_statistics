@@ -26,8 +26,8 @@ class TopCounts(object):
         self.delimiter = delimiter
         self.quotechar = quotechar
              
-    def compute_counts(self, certified_value='CERTIFIED', status='STATUS', 
-                             soc_col='SOC_NAME', state_col='WORKSITE_STATE'):
+    def compute_counts(self, certified_value='CERTIFIED', status='STATUS', soc_col='SOC_NAME', 
+                                      state_col='WORKSITE_STATE', state_col2='WORKLOC1_STATE'):
         """
         Computes counts for desired column field based on column names 
         Args:
@@ -45,16 +45,14 @@ class TopCounts(object):
         with open(self.input_filename, 'r') as f:
             # read file 
             lines = csv.reader(f, quotechar=self.quotechar, delimiter=self.delimiter,
-                             quoting=csv.QUOTE_ALL)
+                                                                quoting=csv.QUOTE_ALL)
             # get column names
             columns = next(lines)
             # need atleast three columns
             assert len(columns) >= 3
             # get indicies 
-            status_index, occ_index, state_index = self._get_indices(columns, status=status, 
-                                                                    soc_col=soc_col, state_col=state_col)
-            # print(columns[31])
-            print(status_index, occ_index, state_index)
+            status_index, occ_index, state_index = self._get_indices(columns, status=status, soc_col=soc_col, 
+                                                                    state_col=state_col, state_col2=state_col2)
             # get total number of certified applications regardless of occupation
             N = 0
             for line in lines:
@@ -80,50 +78,33 @@ class TopCounts(object):
         # return count dicts and total number of certified applications regardless of occupation
         return occupation_counts, state_counts, N
 
-    # def check_if_included(self, split_col, desired_col):
-        # """Check if all values are included in split column"""
-        # return all(col.lower() in split_col for col in desired_col.split('_'))
+    def check_if_included(self, split_col, desired_col):
+        """Check if all values are included in split column"""
+        return all(col.lower() in split_col for col in desired_col.split('_'))
 
-    def _get_indices(self, header_columns, status, soc_col, state_col):
+    def _get_indices(self, header_columns, status, soc_col, state_col, state_col2):
         """
         return indices value of status, occupation and state columns
         """
-        # col_dict = {
-        #         'status': ['CASE_STATUS', 'STATUS'], 
-        #         'occ': ['SOC_NAME', 'LCA_CASE_SOC_NAME'],
-        #         'state': ['WORKSITE_STATE', 'LCA_CASE_WORKLOC1_STATE']}
         try:
             # loop through all column names 
             for i, split_col in enumerate(header_columns):
                 split_col = split_col.lower()
-            #     for col in col_dict['status']:
-            #         if col.lower() in split_col:
-            #             status_index = i
-            #     for col in col_dict['occ']:
-            #         if col.lower() in split_col:
-            #             occ_index = i
-            #     for col in col_dict['state']:
-            #         if col.lower() in split_col:
-            #             state_index = i
-
-
-
-
+                # get status column index 
                 if status.lower() in split_col:
                     status_index = i
-                if 'soc' in split_col:
-                    if 'name' in split_col:
-                        occ_index = i
-                if 'worksite' in split_col:
-                    if 'state' in split_col:
+                # get occupation column index 
+                if self.check_if_included(split_col, soc_col):
+                    occ_index = i
+                # get state column index 
+                for val in [state_col, state_col2]:
+                    if self.check_if_included(split_col, val):
                         state_index = i
-                elif 'workloc1' in split_col:
-                    if 'state' in split_col:
-                        state_index = i
+
             return status_index, occ_index, state_index
         # handle exception
-        except UnboundLocalError:
-            raise Exception('COLUMN NAME NOT FOUND. PLEASE PASS IN ')
+        except UnboundLocalError as e:
+            raise Exception('COLUMN NAME NOT FOUND. PLEASE PASS IN {}'.format(str(e)))
         except IndexError:
             raise Exception('COLUMN NAMES NOT FOUND. PLEASE CHECK COLUMN NAMES')
 
