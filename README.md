@@ -77,3 +77,4 @@ insight_testsuite~$ sh run_tests.sh
 Overview of tests
 - `test_1` - test_1 confirms that the directory structure and output is correct.
 - `test_2` - test_2 confirms that the some permutation of the occupation and state header names doesn't affect the results 
+- `test_3` - test_3 confirms that randomly shuffling the order of the columns doesn't affect the results 
