@@ -53,7 +53,6 @@ class TopCounts(object):
             # get indicies 
             status_index, occ_index, state_index = self._get_indices(columns, status=status, soc_col=soc_col, 
                                                                     state_col=state_col, state_col2=state_col2)
-            print(status_index, occ_index, state_index)
             # get total number of certified applications regardless of occupation
             N = 0
             for line in lines:
@@ -87,8 +86,6 @@ class TopCounts(object):
         """
         return indices value of status, occupation and state columns
         """
-        # state_col2 = 'WORKLOC1_STATE'
-        # state_col_list = [state_col, state_col2]
         try:
             # loop through all column names 
             for i, split_col in enumerate(header_columns):

@@ -37,6 +37,7 @@ def main():
     top_model.write_to_file(top_occs, top_model.occupation_output_filename)
     top_model.write_to_file(top_states, top_model.state_output_filename)
 
+
 if __name__ == '__main__':
     main()
     
